@@ -262,17 +262,64 @@
     font-weight: 600;
   }
 
-  /* ── Card map link ── */
-  .card-map-link {
+  /* ── Card footer links ── */
+  .card-footer-links {
+    display: flex;
+    border-top: 1px solid var(--border);
+  }
+  .card-map-link, .card-web-link {
+    flex: 1;
     display: block;
-    padding: 7px 14px;
+    padding: 7px 10px;
     font-size: .72rem;
     color: var(--muted);
     text-decoration: none;
-    border-top: 1px solid var(--border);
     transition: background .15s;
+    text-align: center;
   }
-  .card-map-link:hover { background: var(--green-pale); color: var(--green-dark); }
+  .card-map-link { border-right: 1px solid var(--border); }
+  .card-map-link:hover, .card-web-link:hover { background: var(--green-pale); color: var(--green-dark); }
+
+  /* ── ZIP search ── */
+  .zip-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+  }
+  .zip-form {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    gap: 8px;
+  }
+  .zip-input {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: .85rem;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+  }
+  .zip-input:focus { border-color: var(--green-light); }
+  .zip-btn {
+    background: var(--green-dark);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 16px;
+    font-size: .85rem;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .zip-btn:hover { background: var(--green); }
+  .zip-notice {
+    max-width: 900px;
+    margin: 8px auto 0;
+    font-size: .75rem;
+    color: var(--muted);
+  }
 
   /* ── Loading / Error ── */
   .state-msg {
@@ -346,6 +393,14 @@
     </div>
   </div>
 </header>
+
+<div class="zip-bar">
+  <div class="zip-form">
+    <input class="zip-input" id="zipInput" type="text" inputmode="numeric" maxlength="5" placeholder="Enter ZIP code (e.g. 75094)" aria-label="ZIP code"/>
+    <button class="zip-btn" id="zipBtn">Search</button>
+  </div>
+  <div class="zip-notice" id="zipNotice"></div>
+</div>
 
 <div class="date-bar">
   <div class="today-label" id="todayLabel">Loading...</div>
@@ -526,7 +581,7 @@ function renderCard(mosque) {
   const jumuahSection = mosque.jumuah?.length ? `
     <div class="card-jumuah">
       <span class="jf-label">Jumu'ah</span>
-      ${mosque.jumuah.map((t,i) => `<span class="jf-tag">${mosque.jumuah.length > 1 ? `${i+1}: ` : ''}${t}</span>`).join('')}
+      ${mosque.jumuah.map(t => `<span class="jf-tag">${t}</span>`).join('')}
       ${isFriday ? '<span style="font-size:.7rem;color:var(--green-dark);margin-left:auto">📅 Today</span>' : ''}
     </div>` : '';
 
@@ -546,9 +601,10 @@ function renderCard(mosque) {
         <tbody>${rows}</tbody>
       </table>
       ${jumuahSection}
-      <a class="card-map-link" href="https://maps.google.com/?q=${mapQuery}" target="_blank">
-        📍 ${mosque.address}
-      </a>
+      <div class="card-footer-links">
+        <a class="card-map-link" href="https://maps.google.com/?q=${mapQuery}" target="_blank">📍 ${mosque.address}</a>
+        <a class="card-web-link" href="${mosque.website}" target="_blank">🌐 Website</a>
+      </div>
     </div>`;
 }
 
@@ -650,6 +706,26 @@ function showToast(msg) {
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 2500);
 }
+
+// ── ZIP search ──
+const LOCAL_ZIPS = new Set(['75094','75098','75074','75023','75075','75025','75024']);
+
+function handleZip() {
+  const zip = document.getElementById('zipInput').value.trim();
+  const notice = document.getElementById('zipNotice');
+  if (!zip || zip.length < 5) { notice.textContent = ''; return; }
+  if (LOCAL_ZIPS.has(zip)) {
+    notice.style.color = 'var(--green-light)';
+    notice.textContent = `✓ Showing local mosques for ${zip} area`;
+    loadData();
+  } else {
+    notice.style.color = 'var(--gold)';
+    notice.textContent = `⚠ ZIP ${zip} is outside the Murphy/Wylie/Plano area — showing local mosques. More ZIP codes coming soon.`;
+  }
+}
+
+document.getElementById('zipBtn').addEventListener('click', handleZip);
+document.getElementById('zipInput').addEventListener('keydown', e => { if (e.key === 'Enter') handleZip(); });
 
 // ── Init ──
 initDark();
