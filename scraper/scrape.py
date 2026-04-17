@@ -25,7 +25,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 log = logging.getLogger(__name__)
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
-ROOT = Path(__file__).parent.parent
+ROOT = Path(os.environ.get('REPO_PATH', Path.cwd()))
 DATA_FILE = ROOT / "data.json"
 CONFIG_FILE = ROOT / "prayer_times.json"
 
@@ -75,13 +75,27 @@ def extract_from_table(soup: BeautifulSoup) -> dict | None:
     return result if len(result) >= 4 else None
 
 
+def is_jumuah_time(t: str) -> bool:
+    """Jumuah is always between 11 AM and 4 PM."""
+    m = re.match(r"(\d{1,2}):(\d{2})\s*([AP]M)", t, re.IGNORECASE)
+    if not m:
+        return False
+    h = int(m.group(1))
+    ap = m.group(3).upper()
+    if ap == "PM" and h != 12:
+        h += 12
+    if ap == "AM" and h == 12:
+        h = 0
+    return 11 <= h <= 16
+
+
 def extract_jumuah_from_table(soup: BeautifulSoup) -> list[str]:
     times = []
     for row in soup.find_all("tr"):
         text = row.get_text(" ", strip=True)
         if re.search(r"jum[ua']+h|friday|جمعة", text, re.IGNORECASE):
             found = TIME_RE.findall(text)
-            times.extend([normalize_time(t) for t in found])
+            times.extend([normalize_time(t) for t in found if is_jumuah_time(t)])
     # Also search divs/spans
     for elem in soup.find_all(string=re.compile(r"jum[ua']+h|friday", re.IGNORECASE)):
         parent = elem.find_parent()
@@ -89,8 +103,9 @@ def extract_jumuah_from_table(soup: BeautifulSoup) -> list[str]:
             if parent is None:
                 break
             found = TIME_RE.findall(parent.get_text())
-            if found:
-                times.extend([normalize_time(t) for t in found])
+            valid = [normalize_time(t) for t in found if is_jumuah_time(t)]
+            if valid:
+                times.extend(valid)
                 break
             parent = parent.find_parent()
     # Deduplicate preserving order
@@ -147,8 +162,8 @@ def scrape_icw() -> dict | None:
             if parsed:
                 prayers = parsed
 
-        # Jumuah from ICW page
-        jumuah = extract_jumuah_from_table(soup)
+        # ICW doesn't post Jumuah on prayer-timings page — use known time
+        jumuah = ["2:15 PM"]
 
         if len(prayers) >= 4:
             log.info("ICW scraped OK")
@@ -201,7 +216,19 @@ def scrape_epic() -> dict | None:
                 if m:
                     prayers[prayer] = {"adhan": normalize_time(m.group(1)), "iqamah": normalize_time(m.group(2))}
 
-        jumuah = extract_jumuah_from_table(soup)
+        # EPIC labels rows "1st Jumuah" / "2nd Jumuah" — parse precisely, deduplicate
+        jumuah_seen: set = set()
+        jumuah = []
+        for row in soup.find_all("tr"):
+            text = row.get_text(" ", strip=True)
+            if re.search(r"\d(st|nd|rd)\s*jum[ua']+h", text, re.IGNORECASE):
+                for t in TIME_RE.findall(text):
+                    nt = normalize_time(t)
+                    if is_jumuah_time(nt) and nt not in jumuah_seen:
+                        jumuah_seen.add(nt)
+                        jumuah.append(nt)
+        if not jumuah:
+            jumuah = extract_jumuah_from_table(soup)
 
         if len(prayers) >= 4:
             log.info("EPIC scraped OK")

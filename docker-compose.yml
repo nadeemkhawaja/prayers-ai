@@ -1,10 +1,10 @@
 services:
-  scraper:
+  prayers-ai:
+    container_name: prayers-ai
     build:
       context: ./scraper
       dockerfile: Dockerfile
     volumes:
-      # Mount the entire repo so the scraper can write data.json and git push
       - .:/repo
     env_file:
       - .env
