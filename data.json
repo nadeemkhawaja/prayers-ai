@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-04-17T11:00:00",
-  "last_updated_display": "April 17, 2026 at 11:00 AM",
+  "last_updated": "2026-04-17T17:22:42",
+  "last_updated_display": "April 17, 2026 at 05:22 PM",
   "mosques": [
     {
       "id": "icw",
@@ -10,13 +10,28 @@
       "phone": "",
       "status": "live",
       "prayers": {
-        "fajr":    { "adhan": "5:48 AM", "iqamah": "6:15 AM" },
-        "dhuhr":   { "adhan": "1:27 PM", "iqamah": "2:00 PM" },
-        "asr":     { "adhan": "5:04 PM", "iqamah": "6:15 PM" },
-        "maghrib": { "adhan": "7:55 PM", "iqamah": "8:05 PM" },
-        "isha":    { "adhan": "9:06 PM", "iqamah": "9:30 PM" }
+        "fajr": {
+          "adhan": "05:42 AM",
+          "iqamah": "06:15 AM"
+        },
+        "dhuhr": {
+          "adhan": "01:26 PM",
+          "iqamah": "02:00 PM"
+        },
+        "asr": {
+          "adhan": "05:04 PM",
+          "iqamah": "06:45 PM"
+        },
+        "maghrib": {
+          "adhan": "07:58 PM",
+          "iqamah": "08:08 PM"
+        },
+        "isha": {
+          "adhan": "09:10 PM",
+          "iqamah": "09:30 PM"
+        }
       },
-      "jumuah": ["2:15 PM"]
+      "jumuah": []
     },
     {
       "id": "epic",
@@ -26,13 +41,32 @@
       "phone": "(214) 396-1943",
       "status": "live",
       "prayers": {
-        "fajr":    { "adhan": "5:43 AM", "iqamah": "6:00 AM" },
-        "dhuhr":   { "adhan": "1:27 PM", "iqamah": "2:00 PM" },
-        "asr":     { "adhan": "5:05 PM", "iqamah": "6:15 PM" },
-        "maghrib": { "adhan": "7:59 PM", "iqamah": "8:09 PM" },
-        "isha":    { "adhan": "9:10 PM", "iqamah": "9:30 PM" }
+        "fajr": {
+          "adhan": "05:43 AM",
+          "iqamah": "06:00 AM"
+        },
+        "dhuhr": {
+          "adhan": "01:27 PM",
+          "iqamah": "02:00 PM"
+        },
+        "asr": {
+          "adhan": "05:05 PM",
+          "iqamah": "06:15 PM"
+        },
+        "maghrib": {
+          "adhan": "07:59 PM",
+          "iqamah": "08:09 PM"
+        },
+        "isha": {
+          "adhan": "09:10 PM",
+          "iqamah": "09:30 PM"
+        }
       },
-      "jumuah": ["1:45 PM", "3:15 PM"]
+      "jumuah": [
+        "01:45 PM",
+        "03:15 PM",
+        "05:43 AM"
+      ]
     },
     {
       "id": "iaqc",
@@ -42,13 +76,31 @@
       "phone": "(214) 435-8961",
       "status": "hardcoded",
       "prayers": {
-        "fajr":    { "adhan": "6:00 AM", "iqamah": "6:00 AM" },
-        "dhuhr":   { "adhan": "2:00 PM", "iqamah": "2:00 PM" },
-        "asr":     { "adhan": "6:00 PM", "iqamah": "6:00 PM" },
-        "maghrib": { "adhan": "8:04 PM", "iqamah": "8:04 PM" },
-        "isha":    { "adhan": "9:30 PM", "iqamah": "9:30 PM" }
+        "fajr": {
+          "adhan": "6:00 AM",
+          "iqamah": "6:00 AM"
+        },
+        "dhuhr": {
+          "adhan": "2:00 PM",
+          "iqamah": "2:00 PM"
+        },
+        "asr": {
+          "adhan": "6:00 PM",
+          "iqamah": "6:00 PM"
+        },
+        "maghrib": {
+          "adhan": "8:04 PM",
+          "iqamah": "8:04 PM"
+        },
+        "isha": {
+          "adhan": "9:30 PM",
+          "iqamah": "9:30 PM"
+        }
       },
-      "jumuah": ["1:30 PM", "2:30 PM"]
+      "jumuah": [
+        "1:30 PM",
+        "2:30 PM"
+      ]
     },
     {
       "id": "iacc",
@@ -58,13 +110,31 @@
       "phone": "972-491-5800",
       "status": "hardcoded",
       "prayers": {
-        "fajr":    { "adhan": "6:30 AM", "iqamah": "6:30 AM" },
-        "dhuhr":   { "adhan": "2:00 PM", "iqamah": "2:00 PM" },
-        "asr":     { "adhan": "4:30 PM", "iqamah": "4:30 PM" },
-        "maghrib": { "adhan": "8:05 PM", "iqamah": "8:05 PM" },
-        "isha":    { "adhan": "8:00 PM", "iqamah": "8:00 PM" }
+        "fajr": {
+          "adhan": "6:30 AM",
+          "iqamah": "6:30 AM"
+        },
+        "dhuhr": {
+          "adhan": "2:00 PM",
+          "iqamah": "2:00 PM"
+        },
+        "asr": {
+          "adhan": "4:30 PM",
+          "iqamah": "4:30 PM"
+        },
+        "maghrib": {
+          "adhan": "8:05 PM",
+          "iqamah": "8:05 PM"
+        },
+        "isha": {
+          "adhan": "8:00 PM",
+          "iqamah": "8:00 PM"
+        }
       },
-      "jumuah": ["1:00 PM", "2:15 PM"]
+      "jumuah": [
+        "1:00 PM",
+        "2:15 PM"
+      ]
     },
     {
       "id": "faizan",
@@ -74,13 +144,30 @@
       "phone": "",
       "status": "hardcoded",
       "prayers": {
-        "fajr":    { "adhan": "6:15 AM", "iqamah": "6:15 AM" },
-        "dhuhr":   { "adhan": "2:00 PM", "iqamah": "2:00 PM" },
-        "asr":     { "adhan": "6:30 PM", "iqamah": "6:30 PM" },
-        "maghrib": { "adhan": "7:57 PM", "iqamah": "7:57 PM" },
-        "isha":    { "adhan": "9:45 PM", "iqamah": "9:45 PM" }
+        "fajr": {
+          "adhan": "6:15 AM",
+          "iqamah": "6:15 AM"
+        },
+        "dhuhr": {
+          "adhan": "2:00 PM",
+          "iqamah": "2:00 PM"
+        },
+        "asr": {
+          "adhan": "6:30 PM",
+          "iqamah": "6:30 PM"
+        },
+        "maghrib": {
+          "adhan": "7:57 PM",
+          "iqamah": "7:57 PM"
+        },
+        "isha": {
+          "adhan": "9:45 PM",
+          "iqamah": "9:45 PM"
+        }
       },
-      "jumuah": ["2:00 PM"]
+      "jumuah": [
+        "2:00 PM"
+      ]
     }
   ]
 }
