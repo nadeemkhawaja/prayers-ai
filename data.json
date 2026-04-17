@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-04-17T17:23:26",
-  "last_updated_display": "April 17, 2026 at 05:23 PM",
+  "last_updated": "2026-04-17T17:24:30",
+  "last_updated_display": "April 17, 2026 at 05:24 PM",
   "mosques": [
     {
       "id": "icw",
@@ -31,7 +31,9 @@
           "iqamah": "09:30 PM"
         }
       },
-      "jumuah": []
+      "jumuah": [
+        "2:15 PM"
+      ]
     },
     {
       "id": "epic",
@@ -65,7 +67,8 @@
       "jumuah": [
         "01:45 PM",
         "03:15 PM",
-        "01:27 PM"
+        "01:45 PM",
+        "03:15 PM"
       ]
     },
     {
