@@ -1,0 +1,11 @@
+services:
+  scraper:
+    build:
+      context: ./scraper
+      dockerfile: Dockerfile
+    volumes:
+      # Mount the entire repo so the scraper can write data.json and git push
+      - .:/repo
+    env_file:
+      - .env
+    restart: "no"

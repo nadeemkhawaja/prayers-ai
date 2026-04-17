@@ -1,0 +1,47 @@
+{
+  "_note": "Edit this file to update hardcoded mosque times. Maghrib changes daily — update it roughly every 2-4 weeks as sunset shifts.",
+  "mosques": {
+    "iaqc": {
+      "name": "IAQC - Islamic Association of Quad Cities",
+      "address": "3800 Parker Rd, St. Paul, TX 75098",
+      "website": "https://iaqctx.org",
+      "phone": "(214) 435-8961",
+      "prayers": {
+        "fajr":    "6:00 AM",
+        "dhuhr":   "2:00 PM",
+        "asr":     "6:00 PM",
+        "maghrib": "8:04 PM",
+        "isha":    "9:30 PM"
+      },
+      "jumuah": ["1:30 PM", "2:30 PM"]
+    },
+    "iacc": {
+      "name": "Plano Masjid (IACC)",
+      "address": "6401 Independence Pkwy, Plano, TX 75023",
+      "website": "https://planomasjid.org",
+      "phone": "972-491-5800",
+      "prayers": {
+        "fajr":    "6:30 AM",
+        "dhuhr":   "2:00 PM",
+        "asr":     "4:30 PM",
+        "maghrib": "8:05 PM",
+        "isha":    "8:00 PM"
+      },
+      "jumuah": ["1:00 PM", "2:15 PM"]
+    },
+    "faizan": {
+      "name": "Masjid Faizan-E-Madinah",
+      "address": "641 W Brown St, Wylie, TX 75098",
+      "website": "https://www.facebook.com/faizanemadinahdallas/",
+      "phone": "",
+      "prayers": {
+        "fajr":    "6:15 AM",
+        "dhuhr":   "2:00 PM",
+        "asr":     "6:30 PM",
+        "maghrib": "7:57 PM",
+        "isha":    "9:45 PM"
+      },
+      "jumuah": ["2:00 PM"]
+    }
+  }
+}
