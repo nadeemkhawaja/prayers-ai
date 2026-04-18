@@ -29,19 +29,19 @@
       },
       "jumuah": ["1:45 PM", "3:00 PM"]
     },
-    "faizan": {
-      "name": "Masjid Faizan-E-Madinah",
-      "address": "641 W Brown St, Wylie, TX 75098",
-      "website": "https://www.facebook.com/faizanemadinahdallas/",
+    "noori": {
+      "name": "Noori Masjid",
+      "address": "Wylie, TX 75098",
+      "website": "https://noorimasjid.net",
       "phone": "",
       "prayers": {
         "fajr":    "6:15 AM",
         "dhuhr":   "2:00 PM",
         "asr":     "6:30 PM",
-        "maghrib": "7:57 PM",
-        "isha":    "9:45 PM"
+        "maghrib": "8:04 PM",
+        "isha":    "9:40 PM"
       },
-      "jumuah": ["2:00 PM"]
+      "jumuah": ["2:10 PM", "3:10 PM"]
     }
   }
 }

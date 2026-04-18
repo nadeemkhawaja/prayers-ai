@@ -2,12 +2,23 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <title>Prayers AI</title>
 <meta name="description" content="Live mosque prayer & iqamah times for Murphy/Wylie TX area"/>
 <meta name="theme-color" content="#1a5c38"/>
+
+<!-- PWA / iOS -->
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="icons/icon-192.png"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Prayers AI"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+
+<!-- Open Graph (sharing preview) -->
+<meta property="og:title" content="Prayers AI"/>
+<meta property="og:description" content="Live mosque prayer & iqamah times — Murphy/Wylie TX"/>
+<meta property="og:type" content="website"/>
 <style>
   /* ── Reset & Tokens ── */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -269,16 +280,24 @@
   }
   .card-map-link, .card-web-link {
     flex: 1;
-    display: block;
-    padding: 7px 10px;
-    font-size: .72rem;
-    color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-height: 44px; /* iOS touch target */
+    padding: 8px 10px;
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--green-dark);
     text-decoration: none;
     transition: background .15s;
     text-align: center;
+    -webkit-tap-highlight-color: rgba(0,0,0,.1);
+    cursor: pointer;
   }
   .card-map-link { border-right: 1px solid var(--border); }
-  .card-map-link:hover, .card-web-link:hover { background: var(--green-pale); color: var(--green-dark); }
+  .card-map-link:hover, .card-web-link:hover,
+  .card-map-link:active, .card-web-link:active { background: var(--green-pale); }
 
   /* ── ZIP search ── */
   .zip-bar {
@@ -561,8 +580,8 @@ function renderCard(mosque) {
 
   const rows = PRAYER_ORDER.map(key => {
     const entry = mosque.prayers?.[key] || {};
+    // Always show Iqamah time only — that's when the congregation prays
     const iqamah = typeof entry === 'object' ? (entry.iqamah || entry.adhan || '—') : entry;
-    const adhan  = typeof entry === 'object' && entry.adhan && entry.adhan !== iqamah ? entry.adhan : null;
     const isNext = key === nextKey;
     return `
       <tr class="${isNext ? 'next-prayer' : ''}">
@@ -573,7 +592,6 @@ function renderCard(mosque) {
         </td>
         <td>
           <div class="time-iqamah">${iqamah}</div>
-          ${adhan ? `<div class="time-adhan">Adhan: ${adhan}</div>` : ''}
         </td>
       </tr>`;
   }).join('');
@@ -597,13 +615,13 @@ function renderCard(mosque) {
         <span class="card-status-badge ${badgeClass}">${badgeLabel}</span>
       </div>
       <table class="prayer-table">
-        <thead><tr><th>Prayer</th><th>Iqamah</th></tr></thead>
+        <thead><tr><th>Prayer</th><th>Iqamah Time</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
       ${jumuahSection}
       <div class="card-footer-links">
-        <a class="card-map-link" href="https://maps.google.com/?q=${mapQuery}" target="_blank">📍 ${mosque.address}</a>
-        <a class="card-web-link" href="${mosque.website}" target="_blank">🌐 Website</a>
+        <a class="card-map-link" href="https://maps.google.com/?q=${mapQuery}" target="_blank" rel="noopener">📍 Map</a>
+        <a class="card-web-link" href="${mosque.website}" target="_blank" rel="noopener">🌐 Website</a>
       </div>
     </div>`;
 }
