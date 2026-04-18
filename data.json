@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-04-17T21:13:59",
-  "last_updated_display": "April 17, 2026 at 09:13 PM",
+  "last_updated": "2026-04-18T04:13:11",
+  "last_updated_display": "April 18, 2026 at 04:13 AM",
   "mosques": [
     {
       "id": "icw",
@@ -11,7 +11,7 @@
       "status": "live",
       "prayers": {
         "fajr": {
-          "adhan": "05:42 AM",
+          "adhan": "05:41 AM",
           "iqamah": "06:15 AM"
         },
         "dhuhr": {
@@ -20,14 +20,14 @@
         },
         "asr": {
           "adhan": "05:04 PM",
-          "iqamah": "06:45 PM"
+          "iqamah": "06:15 PM"
         },
         "maghrib": {
-          "adhan": "07:58 PM",
-          "iqamah": "08:08 PM"
+          "adhan": "07:59 PM",
+          "iqamah": "08:09 PM"
         },
         "isha": {
-          "adhan": "09:10 PM",
+          "adhan": "09:11 PM",
           "iqamah": "09:30 PM"
         }
       },
@@ -112,24 +112,24 @@
       "status": "hardcoded",
       "prayers": {
         "fajr": {
-          "adhan": "6:30 AM",
-          "iqamah": "6:30 AM"
+          "adhan": "6:00 AM",
+          "iqamah": "6:00 AM"
         },
         "dhuhr": {
           "adhan": "2:00 PM",
           "iqamah": "2:00 PM"
         },
         "asr": {
-          "adhan": "4:30 PM",
-          "iqamah": "4:30 PM"
+          "adhan": "6:15 PM",
+          "iqamah": "6:15 PM"
         },
         "maghrib": {
-          "adhan": "8:05 PM",
-          "iqamah": "8:05 PM"
+          "adhan": "8:09 PM",
+          "iqamah": "8:09 PM"
         },
         "isha": {
-          "adhan": "8:00 PM",
-          "iqamah": "8:00 PM"
+          "adhan": "9:30 PM",
+          "iqamah": "9:30 PM"
         }
       },
       "jumuah": [
