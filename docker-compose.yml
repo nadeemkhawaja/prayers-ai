@@ -8,4 +8,4 @@ services:
       - .:/repo
     env_file:
       - .env
-    restart: "no"
+    restart: unless-stopped
