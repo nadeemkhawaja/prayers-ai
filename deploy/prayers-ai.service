@@ -1,0 +1,19 @@
+[Unit]
+Description=Prayers AI (PWA + scraper on :8080)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/prayers-ai
+EnvironmentFile=-/opt/prayers-ai/.env
+Environment=PORT=8080
+Environment=SCRAPE_INTERVAL_HOURS=12
+ExecStart=/usr/bin/python3 /opt/prayers-ai/server.py
+Restart=on-failure
+RestartSec=10
+User=prayers
+Group=prayers
+
+[Install]
+WantedBy=multi-user.target
