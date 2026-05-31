@@ -208,3 +208,92 @@ class TestScrapeNoori:
             result = scrape.scrape_noori()
         assert result is not None
         assert result["jumuah"] == scrape.NOORI_JUMUAH_FALLBACK
+
+
+# ---------------------------------------------------------------------------
+# Cross-scraper robustness (partial / malformed HTML)
+# ---------------------------------------------------------------------------
+
+class TestScraperEdgeCases:
+    def test_icw_too_few_prayers_returns_none(self):
+        """ICW page with only 3 parseable prayer cards returns None."""
+        html = """<html><body>
+            <p>Fajr</p><p>5:00 AM</p><p>Iqamah</p><p>5:30 AM</p>
+            <p>Dhuhr</p><p>1:00 PM</p><p>Iqamah</p><p>1:30 PM</p>
+            <p>Asr</p><p>5:00 PM</p><p>Iqamah</p><p>5:30 PM</p>
+        </body></html>"""
+        with patch("scrape.requests.get", return_value=_mock_response(html)):
+            result = scrape.scrape_icw()
+        assert result is None
+
+    def test_epic_keyword_proximity_fallback(self):
+        """EPIC falls back to keyword proximity when no table is present."""
+        html = """<html><body>
+            <div>Fajr 5:43 AM Iqamah 6:00 AM</div>
+            <div>Dhuhr 1:27 PM Iqamah 2:00 PM</div>
+            <div>Asr 5:05 PM Iqamah 6:15 PM</div>
+            <div>Maghrib 7:59 PM Iqamah 8:09 PM</div>
+            <div>Isha 9:10 PM Iqamah 9:30 PM</div>
+        </body></html>"""
+        with patch("scrape.requests.get", return_value=_mock_response(html)):
+            result = scrape.scrape_epic()
+        assert result is not None
+        assert len(result["prayers"]) >= 4
+
+    def test_noori_too_few_prayers_returns_none(self):
+        """Noori page with only 3 table rows returns None."""
+        html = """<html><body><table>
+            <tr><td>Fajr</td><td>5:29 AM</td><td>6:15 AM</td></tr>
+            <tr><td>Zuhr</td><td>1:27 PM</td><td>2:00 PM</td></tr>
+            <tr><td>Asr</td><td>6:07 PM</td><td>6:30 PM</td></tr>
+        </table></body></html>"""
+        with patch("scrape.requests.get", return_value=_mock_response(html)):
+            result = scrape.scrape_noori()
+        assert result is None
+
+    def test_icw_http_error_returns_none(self):
+        resp = MagicMock()
+        resp.raise_for_status.side_effect = Exception("500 Server Error")
+        with patch("scrape.requests.get", return_value=resp):
+            assert scrape.scrape_icw() is None
+
+    def test_epic_http_error_returns_none(self):
+        resp = MagicMock()
+        resp.raise_for_status.side_effect = Exception("503 Service Unavailable")
+        with patch("scrape.requests.get", return_value=resp):
+            assert scrape.scrape_epic() is None
+
+    def test_noori_connection_error_returns_none(self):
+        with patch("scrape.requests.get", side_effect=ConnectionError("timeout")):
+            assert scrape.scrape_noori() is None
+
+    def test_icw_empty_iqamah_time_skips_prayer(self):
+        """ICW card with no time after 'Iqamah' does not include that prayer."""
+        html = """<html><body>
+            <p>Fajr</p><p>5:00 AM</p><p>Iqamah</p>
+            <p>Dhuhr</p><p>1:00 PM</p><p>Iqamah</p><p>1:30 PM</p>
+            <p>Asr</p><p>5:00 PM</p><p>Iqamah</p><p>5:30 PM</p>
+            <p>Maghrib</p><p>7:00 PM</p><p>Iqamah</p><p>7:05 PM</p>
+            <p>Isha</p><p>9:00 PM</p><p>Iqamah</p><p>9:30 PM</p>
+        </body></html>"""
+        with patch("scrape.requests.get", return_value=_mock_response(html)):
+            result = scrape.scrape_icw()
+        # Fajr should not be present (no iqamah time)
+        if result is not None:
+            assert "fajr" not in result["prayers"]
+
+    def test_epic_jumuah_non_standard_hours_filtered_out(self):
+        """EPIC Jumuah times outside 11 AM–4 PM window are excluded."""
+        html = """<html><body><table>
+            <tr><td>Fajr</td><td>5:43 AM</td><td>6:00 AM</td></tr>
+            <tr><td>Dhuhr</td><td>1:27 PM</td><td>2:00 PM</td></tr>
+            <tr><td>Asr</td><td>5:05 PM</td><td>6:15 PM</td></tr>
+            <tr><td>Maghrib</td><td>7:59 PM</td><td>8:09 PM</td></tr>
+            <tr><td>Isha</td><td>9:10 PM</td><td>9:30 PM</td></tr>
+            <tr><td>1st Jumuah</td><td>5:00 PM</td><td></td></tr>
+            <tr><td>2nd Jumuah</td><td>9:00 AM</td><td></td></tr>
+        </table></body></html>"""
+        with patch("scrape.requests.get", return_value=_mock_response(html)):
+            result = scrape.scrape_epic()
+        assert result is not None
+        assert result["jumuah"] == []  # both times outside valid window
