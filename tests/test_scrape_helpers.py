@@ -3,7 +3,9 @@ Tests for pure helper functions in scrape.py.
 No network calls; all inputs are constructed in-process.
 """
 import json
+import subprocess
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 import pytest
 from bs4 import BeautifulSoup
@@ -332,6 +334,45 @@ class TestLoadHardcoded:
         assert result is not None
         assert len(result["jumuah"]) > 0
 
+    def test_malformed_json_returns_none(self, tmp_path, monkeypatch):
+        bad = tmp_path / "prayer_times.json"
+        bad.write_text("{ not valid json !!}")
+        monkeypatch.setattr(scrape, "CONFIG_FILE", bad)
+        assert scrape.load_hardcoded("iaqc") is None
+
+    def test_missing_mosques_key_returns_none(self, tmp_path, monkeypatch):
+        config = {"something_else": {}}
+        config_file = tmp_path / "prayer_times.json"
+        config_file.write_text(json.dumps(config))
+        monkeypatch.setattr(scrape, "CONFIG_FILE", config_file)
+        assert scrape.load_hardcoded("iaqc") is None
+
+    def test_jumuah_defaults_to_empty_list_when_key_absent(self, tmp_path, monkeypatch):
+        config = {"mosques": {"m": {"prayers": {"fajr": "5:00 AM"}}}}
+        config_file = tmp_path / "prayer_times.json"
+        config_file.write_text(json.dumps(config))
+        monkeypatch.setattr(scrape, "CONFIG_FILE", config_file)
+        result = scrape.load_hardcoded("m")
+        assert result is not None
+        assert result["jumuah"] == []
+
+    def test_partial_config_only_returns_requested_mosque(self, tmp_path, monkeypatch):
+        """File has multiple mosques; only the requested one is returned."""
+        config = {
+            "mosques": {
+                "iaqc": {"prayers": {"fajr": "5:00 AM"}, "jumuah": []},
+                "iacc": {"prayers": {"fajr": "5:10 AM"}, "jumuah": ["1:30 PM"]},
+            }
+        }
+        config_file = tmp_path / "prayer_times.json"
+        config_file.write_text(json.dumps(config))
+        monkeypatch.setattr(scrape, "CONFIG_FILE", config_file)
+
+        iaqc = scrape.load_hardcoded("iaqc")
+        iacc = scrape.load_hardcoded("iacc")
+        assert iaqc["prayers"]["fajr"]["adhan"] == "5:00 AM"
+        assert iacc["prayers"]["fajr"]["adhan"] == "5:10 AM"
+
 
 # ---------------------------------------------------------------------------
 # push_to_github (env-var paths only; no subprocess calls)
@@ -347,3 +388,96 @@ class TestPushToGithub:
         monkeypatch.setenv("GITHUB_TOKEN", "tok")
         monkeypatch.delenv("GITHUB_REPO", raising=False)
         assert scrape.push_to_github() is False
+
+    def test_returns_true_when_no_staged_changes(self, monkeypatch):
+        """No staged changes → skips commit/push and returns True."""
+        monkeypatch.setenv("GITHUB_TOKEN", "tok")
+        monkeypatch.setenv("GITHUB_REPO", "owner/repo")
+        calls = []
+        no_change = MagicMock()
+        no_change.returncode = 0
+
+        def fake_run(cmd, **kw):
+            calls.append(list(cmd))
+            if cmd[:2] == ["git", "diff"]:
+                return no_change
+            return MagicMock()
+
+        with patch("scrape.subprocess.run", side_effect=fake_run):
+            result = scrape.push_to_github()
+
+        assert result is True
+        flat = [" ".join(c) for c in calls]
+        assert not any("commit" in c for c in flat)
+        assert not any("push" in c for c in flat)
+
+    def test_commits_and_pushes_when_changes_exist(self, monkeypatch):
+        """Staged changes present → git commit and git push are called."""
+        monkeypatch.setenv("GITHUB_TOKEN", "tok")
+        monkeypatch.setenv("GITHUB_REPO", "owner/repo")
+        calls = []
+        has_changes = MagicMock()
+        has_changes.returncode = 1
+
+        def fake_run(cmd, **kw):
+            calls.append(list(cmd))
+            if cmd[:2] == ["git", "diff"]:
+                return has_changes
+            return MagicMock()
+
+        with patch("scrape.subprocess.run", side_effect=fake_run):
+            result = scrape.push_to_github()
+
+        assert result is True
+        flat = [" ".join(c) for c in calls]
+        assert any("commit" in c for c in flat)
+        assert any("push" in c for c in flat)
+
+    def test_remote_url_contains_token_and_repo(self, monkeypatch):
+        """Remote URL embeds the auth token and repo slug."""
+        monkeypatch.setenv("GITHUB_TOKEN", "secret123")
+        monkeypatch.setenv("GITHUB_REPO", "myorg/myrepo")
+        calls = []
+        no_change = MagicMock()
+        no_change.returncode = 0
+
+        def fake_run(cmd, **kw):
+            calls.append(list(cmd))
+            if cmd[:2] == ["git", "diff"]:
+                return no_change
+            return MagicMock()
+
+        with patch("scrape.subprocess.run", side_effect=fake_run):
+            scrape.push_to_github()
+
+        set_url = next((c for c in calls if "set-url" in c), None)
+        assert set_url is not None
+        assert "secret123" in set_url[-1]
+        assert "myorg/myrepo" in set_url[-1]
+
+    def test_stages_data_json_before_diff(self, monkeypatch):
+        """git add data.json is always called before the diff check."""
+        monkeypatch.setenv("GITHUB_TOKEN", "tok")
+        monkeypatch.setenv("GITHUB_REPO", "owner/repo")
+        calls = []
+        no_change = MagicMock()
+        no_change.returncode = 0
+
+        def fake_run(cmd, **kw):
+            calls.append(list(cmd))
+            if cmd[:2] == ["git", "diff"]:
+                return no_change
+            return MagicMock()
+
+        with patch("scrape.subprocess.run", side_effect=fake_run):
+            scrape.push_to_github()
+
+        assert ["git", "add", "data.json"] in calls
+
+    def test_returns_false_on_subprocess_error(self, monkeypatch):
+        """CalledProcessError from any git command returns False."""
+        monkeypatch.setenv("GITHUB_TOKEN", "tok")
+        monkeypatch.setenv("GITHUB_REPO", "owner/repo")
+        error = subprocess.CalledProcessError(1, "git", b"", b"fatal: error")
+        with patch("scrape.subprocess.run", side_effect=error):
+            assert scrape.push_to_github() is False

@@ -204,53 +204,6 @@ def scrape_icw() -> dict | None:
 
 
 # ---------------------------------------------------------------------------
-# Faizan-E-Madinah Scraper — us.mohid.co/tx/dallas/didfw
-# MOHID platform shows Azaan + Iqama times in a consistent table
-# ---------------------------------------------------------------------------
-
-def scrape_faizan() -> dict | None:
-    url = "https://us.mohid.co/tx/dallas/didfw"
-    log.info("Scraping Faizan (MOHID): %s", url)
-    try:
-        r = requests.get(url, headers=HEADERS, timeout=20)
-        r.raise_for_status()
-        soup = BeautifulSoup(r.text, "lxml")
-
-        prayers = {}
-        jumuah = []
-
-        # MOHID shows a table: Prayer | Azaan | Iqama
-        parsed = extract_from_table(soup)
-        if parsed:
-            prayers = parsed
-
-        # Fallback: keyword proximity
-        if not prayers:
-            for prayer in PRAYER_KEYS:
-                times = find_times_near_keyword(soup, prayer)
-                if times:
-                    prayers[prayer] = {
-                        "adhan":  times[0],
-                        "iqamah": times[-1] if len(times) > 1 else times[0],
-                    }
-
-        # Jumuah from MOHID page
-        jumuah = extract_jumuah_from_table(soup)
-
-        if len(prayers) >= 4:
-            log.info("Faizan scraped OK — prayers: %s, jumuah: %s",
-                     {k: v["iqamah"] for k, v in prayers.items()}, jumuah)
-            return {"prayers": prayers, "jumuah": jumuah or ["2:00 PM"], "status": "live"}
-
-        log.warning("Faizan: could not parse, will use fallback")
-        return None
-
-    except Exception as e:
-        log.error("Faizan scrape error: %s", e)
-        return None
-
-
-# ---------------------------------------------------------------------------
 # EPIC Masjid Scraper — epicmasjid.org (times on homepage)
 # ---------------------------------------------------------------------------
 
